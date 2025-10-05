@@ -23,7 +23,7 @@ impl Default for ExprId {
 /// Leaf nodes contain data whereas internal nodes contain other
 /// expressions.
 #[derive(Debug)]
-enum ExprNode {
+pub enum ExprNode {
     Constant { value: f64 },
     Parameter { index: u32, name: String },
     Add { lhs: Expr, rhs: Expr },
@@ -35,7 +35,7 @@ enum ExprNode {
 /// Multiple expressions can share the same sub-expression allowing computations
 /// to reuse intermediate results.
 #[derive(Debug)]
-struct Expr {
+pub struct Expr {
     node: Arc<ExprNode>,
     id: ExprId,
 }
