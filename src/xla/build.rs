@@ -46,6 +46,41 @@ fn main() -> anyhow::Result<()> {
         download_xla(&out_dir)?;
     }
 
+    let mut config = cpp_build::Config::new();
+    config
+        .flag("-std=c++17")
+        .flag("-DLLVM_ON_UNIX=1")
+        .flag("-DLLVM_VERSION_STRING=")
+        .flag(&format!("-isystem{}", xla_dir.join("include").display()))
+        // .file(xla_dir.join("include/xla/client/xla_builder.cc"))
+        .file("./vendor/jaxlib/cpu/cpu_kernels.cc")
+        .file("./vendor/jaxlib/cpu/lapack_kernels.cc")
+        .include("./vendor");
+
+    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("Missing manifest dir"));
+    config.build(manifest_dir.join("src/lib.rs"));
+
+    // Link configuration to the XLA extension
+    //
+    // Dynamic linking allows the XLA extension to remain as a separate file
+    if cfg!(feature = "shared") {
+        println!("cargo:rustc-link-search={}", xla_dir.join("lib").display());
+        println!("cargo:rustc-link-lib=dylib=xla_extension");
+    // Static linking embeds the XLA extension directly into the executable
+    } else {
+        println!(
+            "cargo:rustc-link-search=native={}",
+            xla_dir.join("lib").display()
+        );
+        println!("cargo:rustc-link-lib=static=xla_extension");
+    }
+
+    if os == OS::MacOS {
+        println!("cargo:rustc-link-lib=framework=Foundation");
+        println!("cargo:rustc-link-lib=framework=SystemConfiguration");
+        println!("cargo:rustc-link-lib=framework=Security");
+    }
+
     Ok(())
 }
 
