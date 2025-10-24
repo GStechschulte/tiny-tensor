@@ -4,9 +4,9 @@
 
 ## Project structure
 
-The `vendor` directory contains hand-picked files from `jaxlib` that are needed for minimal functionality instead of bringing in the entire `jaxlib` as a dependency. The `build.rs` script in the workspace root compiles these C++ files into native code that is linked with the Rust library.
+The `vendor` directory contains hand-picked files from `jaxlib` that are needed for minimal jax-like functionality in Rust instead of bringing in the entire `jaxlib` as a dependency.
 
-The `build.rs` script is responsible for determining the OS and architecture, and downloading the XLA extension (either shared or as a static binary).
+The `build.rs` script in the workspace root downloads the XLA compiler and the `jaxlib` C++ files into native code that is linked with the Rust library. This script is also responsible for determining the OS and architecture, and downloading the XLA extension (either shared or as a static binary).
 
 To check if `build.rs` ran properly:
 
@@ -15,7 +15,7 @@ To check if `build.rs` ran properly:
 cargo clean
 
 # 2. Enable verbose output and build
-cargo buisld -vv
+cargo build -vv
 
 # 3. Examine the build artifacts
 ls -la target/debug/build/xla-*
@@ -55,3 +55,13 @@ cpp_class!(pub unsafe struct XlaBuilder as "std::shared_ptr<XlaBuilder>");
 ```
 
 creates a Rust type that wraps `std::shared_ptr<XlaBuilder>"`. `unsafe` is necessary because the FFI boundary cannot provide any safety guarantees on the C++ code. However, the `cpp` crate automatically adds the `Drop` trait for C++ types that have destructors.
+
+## Types
+
+There are multiple interconnected type representations:
+
+* **Native**. Trait that bridge between Rust and XLA types.
+* **Element**. Rust types (user-facing).
+* **Primitive**. XLA types.
+
+Primitive types are what gets passed across the FFI boundary. Element types are user-facing Rust types. The native type trait connects Rust types to the corresponding XLA types.
