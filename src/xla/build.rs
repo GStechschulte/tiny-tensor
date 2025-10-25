@@ -59,6 +59,17 @@ fn main() -> anyhow::Result<()> {
 
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("Missing manifest dir"));
     config.build(manifest_dir.join("src/lib.rs"));
+    // println!("cargo:rerun-if-changed=src/executable.rs");
+    // println!("cargo:rerun-if-changed=src/literal.rs");
+    println!("cargo:rerun-if-changed=src/op.rs");
+    // println!("cargo:rerun-if-changed=src/shape.rs");
+    println!("cargo:rerun-if-changed=src/native_type.rs");
+    println!("cargo:rerun-if-changed=src/builder.rs");
+    println!("cargo:rerun-if-changed=src/error.rs");
+    println!("cargo:rerun-if-changed=src/client.rs");
+    // println!("cargo:rerun-if-changed=src/buffer.rs");
+    // println!("cargo:rerun-if-changed=src/computation.rs");
+    // println!("cargo:rerun-if-changed=src/hlo_module.rs");
 
     // Link configuration to the XLA extension
     //

@@ -60,8 +60,8 @@ creates a Rust type that wraps `std::shared_ptr<XlaBuilder>"`. `unsafe` is neces
 
 There are multiple interconnected type representations:
 
-* **Native**. Trait that bridge between Rust and XLA types.
+* **Native**. Trait that bridges between Rust and XLA types.
 * **Element**. Rust types (user-facing).
 * **Primitive**. XLA types.
 
-Primitive types are what gets passed across the FFI boundary. Element types are user-facing Rust types. The native type trait connects Rust types to the corresponding XLA types.
+Primitive types are what gets passed across the FFI boundary. Element types are user-facing Rust types. The native type trait connects Rust types to the corresponding XLA types allowing users to use Rust types such as `f32`, `i32` and the native type trait handles the conversion.
