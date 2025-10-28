@@ -1,5 +1,7 @@
 # xla
 
+_Note_: This is a port of Nox [noxla](https://github.com/elodin-sys/elodin/tree/main/libs/noxla) but is intended to be better documented and more ergonomic (eventually).
+
 `xla` is a Rust wrapper around XLA, a compiler for machine learning and linear algebra. The goal of this workspace is to create a set of safe bindings close to XLA's C++ API.
 
 ## Project structure
