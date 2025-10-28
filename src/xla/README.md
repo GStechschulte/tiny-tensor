@@ -29,7 +29,7 @@ cat target/debug/build/xla-*/output
 # 6. Check compiled library linkage
 otool -L target/debug/libxla.dylib
 # On Linux:
-ldd target/debug/libxla.so
+# ldd target/debug/libxla.so
 
 # 7. Check if custom kernels were compiled
 find target/debug/build/xla-* -name "*.o"
@@ -55,6 +55,35 @@ cpp_class!(pub unsafe struct XlaBuilder as "std::shared_ptr<XlaBuilder>");
 ```
 
 creates a Rust type that wraps `std::shared_ptr<XlaBuilder>"`. `unsafe` is necessary because the FFI boundary cannot provide any safety guarantees on the C++ code. However, the `cpp` crate automatically adds the `Drop` trait for C++ types that have destructors.
+
+The goal is to essentially create a set of wrappers around the XLA C++ API so you, the Rust developer, can develop in Rust without having to think about the FFI bounary. When you call methods on the wrappers, you are actually calling into the underlying C++ code. For example, in the following code, the goal is to create a wrapper around the `XlaBuilder` class.
+
+```Rust
+cpp! {{
+    #include "xla/client/xla_builder.h"
+    using namespace xla;
+}}
+
+cpp_class!(pub unsafe struct XlaBuilder as "std::shared_ptr<XlaBuilder>");
+
+impl XlaBuilder {
+    pub fn new(name: &str) -> Self {
+        let_cxx_string!(name = name);
+        unsafe {
+            // Captures `name` and declares as pointer to string in C++
+            // Returns shared pointer to `XlaBuilder` which is converted back to Rust `XlaBuilder`
+            cpp!( [name as "std::string*"] -> XlaBuilder as "std::shared_ptr<XlaBuilder>" {
+                std::shared_ptr<XlaBuilder> builder(new XlaBuilder(*name));
+                return builder;
+            })
+        }
+    }
+}
+```
+
+
+
+
 
 ## Types
 
